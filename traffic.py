@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 #used chatGPT to look up the styling
 st.markdown("<h3 style='text-align: center;'>Utilize our advanced Machine Learning application to predict traffic volume.</h3>", unsafe_allow_html=True)
 st.image('traffic_image.gif', use_column_width=True)
-sign = st.info("Please choose a data input method to proceed")
 
 with open('bst_traffic.pickle', 'rb') as model_pickle:
     bst_model = pickle.load(model_pickle)
@@ -52,9 +51,9 @@ with st.sidebar.expander("Option 2: Fill out Form"):
         hour = st.selectbox('Choose hour', options=df['hour'].unique())
         submit_button = st.form_submit_button("Submit Form Data")
 
-alpha = st.slider('Select alpha value for prediction intervals', min_value=0.01, max_value=0.5, step=0.01)
 if file_upload is None and submit_button:
-    st.success("Form data submitted successfully.")
+    st.success("Form completed successfully.")
+    alpha = st.slider('Select alpha value for prediction intervals', min_value=0.01, max_value=0.5, step=0.01)
     encode_dff = df.copy()
     encode_dff.loc[len(encode_dff)] = [holiday, temp, rain, snow, clouds, weather, month, weekday, hour]
     encode_dff = pd.get_dummies(encode_dff, columns=['holiday','weather_main','month','weekday','hour'])
@@ -68,6 +67,7 @@ if file_upload is None and submit_button:
 
 elif file_upload is not None:
     st.success("CSV file uploaded successfully.")
+    alpha = st.slider('Select alpha value for prediction intervals', min_value=0.01, max_value=0.5, step=0.01)
     user_df = pd.read_csv(file_upload)
     user_df = user_df[df.columns] 
     combined_df = pd.concat([df, user_df], axis=0)
@@ -85,7 +85,9 @@ elif file_upload is not None:
 
     st.subheader(f"Prediction Results with {int((1-alpha)*100)}% Prediction Interval")
     st.dataframe(user_df)
-
+else:
+    st.info("Please choose a data input method to proceed")
+    alpha = st.slider('Select alpha value for prediction intervals', min_value=0.01, max_value=0.5, step=0.01)
 st.subheader("Model Performance and Inference")
 
 tab1, tab2, tab3, tab4 = st.tabs(["Feature Importance", 
